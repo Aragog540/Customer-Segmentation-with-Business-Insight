@@ -1,141 +1,155 @@
+
+
 # Customer Segmentation with Business Insight
 
-## 📌 Project Overview
+## Overview
 
-This project applies unsupervised machine learning techniques to segment customers based on demographic and behavioral attributes. Using clustering and dimensionality reduction, it identifies distinct customer groups and generates actionable business insights for targeted marketing and strategic decision-making.
+This project implements an end-to-end customer segmentation pipeline using unsupervised machine learning techniques. The objective is to identify meaningful customer groups based on purchasing behavior and translate them into actionable business insights.
 
----
-
-## 🎯 Objectives
-
-* Clean and preprocess customer data
-* Perform feature scaling
-* Apply K-Means clustering
-* Evaluate clustering performance
-* Reduce dimensionality using PCA
-* Visualize customer clusters
-* Derive business insights
+The pipeline includes RFM-based feature engineering, clustering model comparison, and PCA-based visualization.
 
 ---
 
-## 📊 Dataset Description
+## Dataset
 
-The dataset contains **600 retail customers** with the following features:
+**Dataset Used:** Customer Personality Analysis (Kaggle)
 
-* **Age** – Customer age
-* **Annual_Income_k$** – Annual income (in thousand dollars)
-* **Spending_Score** – Score based on purchasing behavior (1–100)
-* **Online_Purchases_per_Month** – Monthly online purchase frequency
-* **Tenure_Years** – Years as a customer
-* **True_Segment** – Ground-truth label (for validation purposes only)
+The dataset contains customer demographic details, purchasing history, campaign responses, and transaction behavior.
+
+Key attributes used:
+
+* Recency
+* Purchase frequency
+* Total spending across product categories
+* Web, catalog, and store purchases
 
 ---
 
-## 🛠 Technologies Used
+## Problem Statement
+
+Businesses need to identify high-value customers and churn-risk segments to optimize marketing strategies. This project addresses that challenge by:
+
+* Engineering behavioral features
+* Applying clustering algorithms
+* Comparing model performance
+* Translating clusters into business insights
+
+---
+
+## Project Pipeline
+
+### 1. Data Preprocessing
+
+* Missing value handling
+* RFM feature engineering
+* Outlier removal using IQR method
+
+### 2. Feature Engineering
+
+* **Recency**
+* **Frequency** (combined web, catalog, and store purchases)
+* **Monetary Value** (Total Spending)
+
+### 3. Feature Scaling
+
+* StandardScaler normalization
+
+### 4. Clustering
+
+* K-Means
+* Hierarchical (Agglomerative) Clustering
+* Model comparison using Silhouette Score
+
+### 5. Dimensionality Reduction
+
+* PCA for 2D cluster visualization
+
+### 6. Business Insight Extraction
+
+* Cluster profiling using group-wise averages
+* Identification of premium, moderate, and churn-risk segments
+
+---
+
+## Model Evaluation
+
+Models were evaluated using:
+
+* Silhouette Score
+* Cluster separation comparison
+* Interpretability of segments
+
+K-Means demonstrated stronger separation performance after feature optimization.
+
+---
+
+## Business Insights
+
+Example outcomes from clustering:
+
+* High-frequency, high-spending customers identified as premium segment
+* Low-frequency, recent customers flagged as churn-risk
+* Mid-tier customers suitable for targeted upselling campaigns
+
+These insights can support:
+
+* Targeted marketing
+* Customer retention strategies
+* Campaign personalization
+
+---
+
+## Tech Stack
 
 * Python
-* NumPy
 * Pandas
-* Matplotlib
-* Seaborn
+* NumPy
 * Scikit-learn
+* Matplotlib
+* SciPy
 
 ---
 
-## ⚙ Methodology
-
-### 1️⃣ Data Preprocessing
-
-* Loaded dataset
-* Removed `True_Segment` column for clustering
-* Checked for missing values
-
-### 2️⃣ Feature Scaling
-
-Standardized features using `StandardScaler` to ensure equal contribution in distance-based clustering.
-
-### 3️⃣ Clustering
-
-* Applied **K-Means algorithm**
-* Used **Elbow Method** to determine optimal cluster count
-* Evaluated using **Silhouette Score**
-
-### 4️⃣ Dimensionality Reduction
-
-Used **Principal Component Analysis (PCA)** to reduce dimensions to 2 for visualization.
-
-### 5️⃣ Visualization
-
-Plotted clusters using PCA components to observe separation patterns.
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```
-customer_segmentation/
-│
-├── customer_segmentation_dataset.csv
-├── segmentation.py
-├── README.md
-└── requirements.txt
+├── marketing_campaign.csv
+├── customer_segmentation.py
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## ▶ How to Run
+## How to Run
 
-### Install Dependencies
-
-```
-pip install pandas numpy matplotlib seaborn scikit-learn
-```
-
-### Run the Script
+Install dependencies:
 
 ```
-python segmentation.py
+pip install -r requirements.txt
+```
+
+Run the pipeline:
+
+```
+python customer_segmentation.py
 ```
 
 ---
 
-## 📈 Expected Outputs
+## Future Improvements
 
-* Elbow Curve Plot
-* Silhouette Score
-* PCA-Based Cluster Visualization
-* Cluster-wise Statistical Summary
-
----
-
-## 💡 Business Insights
-
-The model typically identifies segments such as:
-
-* **Premium Loyal Customers**
-* **Impulse Young Buyers**
-* **Wealthy Conservative Buyers**
-* **Price Sensitive Customers**
-
-These segments help businesses to:
-
-* Design targeted marketing campaigns
-* Improve retention strategies
-* Personalize recommendations
-* Optimize promotional spending
+* Automatic optimal cluster detection
+* DBSCAN comparison
+* Model persistence using joblib
+* API deployment
+* Interactive dashboard integration
 
 ---
 
-## 🚀 Future Improvements
+## Author
 
-* Implement DBSCAN or Gaussian Mixture Models
-* Apply RFM (Recency, Frequency, Monetary) analysis
-* Deploy as a Streamlit dashboard
-* Use real-world transactional datasets
+Swaroop Bhowmik
+B.Tech CSE (AI & ML)
 
 ---
-
-## 👨‍💻 Author
-
-**Swaroop Bhowmik**
-B.Tech CSE (AI & ML Specialization)
