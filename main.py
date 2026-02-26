@@ -2,47 +2,71 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+from scipy.cluster.hierarchy import dendrogram, linkage
 
-data = pd.read_csv("customer_segmentation_dataset.csv")
+df = pd.read_csv("marketing_campaign.csv", sep="\t")
 
-X = data.drop(columns=["True_Segment"])
+print("Initial Shape:", df.shape)
+
+df = df.dropna()
+
+df["Total_Spending"] = (
+    df["MntWines"] + df["MntFruits"] + df["MntMeatProducts"] +
+    df["MntFishProducts"] + df["MntSweetProducts"] + df["MntGoldProds"]
+)
+
+rfm = df[["Recency", "Total_Spending", "NumWebPurchases",
+          "NumCatalogPurchases", "NumStorePurchases"]]
+
+rfm["Frequency"] = (
+    rfm["NumWebPurchases"] +
+    rfm["NumCatalogPurchases"] +
+    rfm["NumStorePurchases"]
+)
+
+rfm = rfm[["Recency", "Frequency", "Total_Spending"]]
+
+Q1 = rfm.quantile(0.25)
+Q3 = rfm.quantile(0.75)
+IQR = Q3 - Q1
+
+rfm = rfm[~((rfm < (Q1 - 1.5 * IQR)) |
+            (rfm > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+print("Shape after outlier removal:", rfm.shape)
 
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-wcss = []
-for i in range(1, 11):
-    kmeans = KMeans(n_clusters=i, random_state=42)
-    kmeans.fit(X_scaled)
-    wcss.append(kmeans.inertia_)
-
-plt.figure(figsize=(6,4))
-plt.plot(range(1, 11), wcss, marker='o')
-plt.xlabel("Number of Clusters")
-plt.ylabel("WCSS")
-plt.title("Elbow Method")
-plt.show()
+rfm_scaled = scaler.fit_transform(rfm)
 
 kmeans = KMeans(n_clusters=4, random_state=42)
-clusters = kmeans.fit_predict(X_scaled)
+kmeans_labels = kmeans.fit_predict(rfm_scaled)
 
-data["Cluster"] = clusters
+kmeans_silhouette = silhouette_score(rfm_scaled, kmeans_labels)
+print("K-Means Silhouette Score:", round(kmeans_silhouette, 3))
 
-print("Silhouette Score:", silhouette_score(X_scaled, clusters))
+hierarchical = AgglomerativeClustering(n_clusters=4)
+hier_labels = hierarchical.fit_predict(rfm_scaled)
+
+hier_silhouette = silhouette_score(rfm_scaled, hier_labels)
+print("Hierarchical Silhouette Score:", round(hier_silhouette, 3))
 
 pca = PCA(n_components=2)
-pca_data = pca.fit_transform(X_scaled)
+pca_components = pca.fit_transform(rfm_scaled)
 
-data["PCA1"] = pca_data[:, 0]
-data["PCA2"] = pca_data[:, 1]
-
-plt.figure(figsize=(8,6))
-sns.scatterplot(x="PCA1", y="PCA2", hue="Cluster", palette="Set2", data=data)
-plt.title("Customer Segmentation using PCA")
+plt.figure()
+plt.scatter(pca_components[:, 0], pca_components[:, 1], c=kmeans_labels)
+plt.title("Customer Segments (K-Means + PCA)")
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
 plt.show()
 
-print(data.groupby("Cluster").mean())
+rfm["Cluster"] = kmeans_labels
+cluster_summary = rfm.groupby("Cluster").mean()
+
+print("\nCluster Summary:")
+print(cluster_summary)
